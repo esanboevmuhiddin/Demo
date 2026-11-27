@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<h1>Личный кабинет</h1>
+<p class="muted">Здравствуйте, {{ user.profile.full_name|default:user.username }}!</p>
+
+<div class="slider" id="slider">
+    <div class="slides">
+        <img src="{% static 'img/slide1.jpg' %}" alt="Катер">
+        <img src="{% static 'img/slide2.jpg' %}" alt="Лайнер">
+        <img src="{% static 'img/slide3.jpg' %}" alt="Яхта">
+        <img src="{% static 'img/slide4.jpg' %}" alt="Река">
+    </div>
+    <button class="slider-prev" aria-label="Назад">&#10094;</button>
+    <button class="slider-next" aria-label="Вперед">&#10095;</button>
+    <div class="slider-dots"></div>
+</div>
+
+<h2>Мои заявки</h2>
+{% if applications %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>№</th><th>Транспорт</th><th>Дата старта</th>
+            <th>Оплата</th><th>Статус</th><th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for a in applications %}
+        <tr>
+            <td>{{ a.pk }}</td>
+            <td>{{ a.get_transport_display }}</td>
+            <td>{{ a.start_date|date:"d.m.Y" }}</td>
+            <td>{{ a.get_payment_display }}</td>
+            <td><span class="badge status-{{ a.status }}">{{ a.get_status_display }}</span></td>
+            <td>
+                {% if a.status == 'done' and not a.review %}
+                    <a href="{% url 'review_create' a.pk %}" class="btn btn-sm">Оставить отзыв</a>
+                {% elif a.review %}
+                    <span class="muted">Отзыв оставлен ★{{ a.review.rating }}</span>
+                {% else %}
+                    <span class="muted">—</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<div class="pagination">
+    {% if applications.has_previous %}
+        <a href="?page={{ applications.previous_page_number }}">← Назад</a>
+    {% endif %}
+    <span>Стр. {{ applications.number }} из {{ applications.paginator.num_pages }}</span>
+    {% if applications.has_next %}
+        <a href="?page={{ applications.next_page_number }}">Вперед →</a>
+    {% endif %}
+</div>
+{% else %}
+<p>У вас пока нет заявок. <a href="{% url 'application_create' %}">Создать заявку</a></p>
+{% endif %}
+{% endblock %}

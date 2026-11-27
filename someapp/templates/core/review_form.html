@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-card">
+    <h1>Отзыв по заявке #{{ app.pk }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+            </div>
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Отправить отзыв</button>
+    </form>
+</div>
+{% endblock %}

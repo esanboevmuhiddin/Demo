@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Админ-панель{% endblock %}
+{% block content %}
+<h1>Панель управления</h1>
+
+<form method="get" class="filter-bar">
+    <input type="text" name="q" value="{{ q }}" placeholder="Поиск по логину или ФИО">
+    <select name="status">
+        <option value="">Все статусы</option>
+        {% for code, label in statuses %}
+            <option value="{{ code }}" {% if status_filter == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <select name="sort">
+        <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Новые сначала</option>
+        <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Старые сначала</option>
+        <option value="start_date" {% if sort == 'start_date' %}selected{% endif %}>Дата старта ↑</option>
+        <option value="-start_date" {% if sort == '-start_date' %}selected{% endif %}>Дата старта ↓</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Применить</button>
+</form>
+
+<table class="data-table">
+    <thead>
+    <tr>
+        <th>№</th><th>Пользователь</th><th>ФИО</th><th>Транспорт</th>
+        <th>Дата старта</th><th>Оплата</th><th>Статус</th><th>Изменить</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for a in applications %}
+        <tr>
+            <td>{{ a.pk }}</td>
+            <td>{{ a.user.username }}</td>
+            <td>{{ a.user.profile.full_name }}</td>
+            <td>{{ a.get_transport_display }}</td>
+            <td>{{ a.start_date|date:"d.m.Y" }}</td>
+            <td>{{ a.get_payment_display }}</td>
+            <td><span class="badge status-{{ a.status }}">{{ a.get_status_display }}</span></td>
+            <td>
+                <form method="post" action="{% url 'admin_change_status' a.pk %}">
+                    {% csrf_token %}
+                    <select name="status" onchange="this.form.submit()">
+                        {% for code, label in statuses %}
+                            <option value="{{ code }}" {% if a.status == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    {% if applications.has_previous %}
+        <a href="?page={{ applications.previous_page_number }}&q={{ q }}&status={{ status_filter }}&sort={{ sort }}">← Назад</a>
+    {% endif %}
+    <span>Стр. {{ applications.number }} из {{ applications.paginator.num_pages }}</span>
+    {% if applications.has_next %}
+        <a href="?page={{ applications.next_page_number }}&q={{ q }}&status={{ status_filter }}&sort={{ sort }}">Вперед →</a>
+    {% endif %}
+</div>
+{% endblock %}
