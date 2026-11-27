@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let index = 0;
     let timer = null;
 
+    // Создаем точки
     imgs.forEach((_, i) => {
         const dot = document.createElement('span');
         if (i === 0) dot.classList.add('active');
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function prev() { goTo(index - 1); }
 
     function start() { timer = setInterval(next, 3000); }
-    function stop()  { clearInterval(timer); }
+    function stop() { clearInterval(timer); }
     function restart() { stop(); start(); }
 
     nextBtn.addEventListener('click', next);
