@@ -32,18 +32,29 @@ class Profile(models.Model):
 
 
 class Application(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
-    transport = models.CharField(max_length=20, choices=Transport.choices, verbose_name='Вид транспорта')
-    start_date = models.DateField('Дата начала обучения')
-    payment = models.CharField(max_length=20, choices=Payment.choices, verbose_name='Способ оплаты')
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW, verbose_name='Статус')
-    created_at = models.DateTimeField(auto_now_add=True)
+    # Выборы транспорта (пример)
+    TRANSPORT_CHOICES = [
+        ('kater', 'Катер'),
+        ('layner', 'Лайнер'),
+        ('yahta', 'Яхта'),
+        ('reka', 'Река'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('new', 'Новая'),
+        ('accepted', 'Принята'),
+        ('done', 'Выполнена'),
+    ]
 
-    class Meta:
-        ordering = ['-created_at']
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+    transport = models.CharField("Транспорт", max_length=20, choices=TRANSPORT_CHOICES)
+    start_date = models.DateField("Дата старта")
+    payment = models.CharField("Оплата", max_length=50, blank=True, null=True)
+    status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default='new')
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
     def __str__(self):
-        return f'Заявка #{self.pk} — {self.get_transport_display()}'
+        return f"Заявка #{self.pk} - {self.get_transport_display()}"
 
 
 class Review(models.Model):

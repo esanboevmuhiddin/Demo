@@ -11,7 +11,6 @@ from .forms import RegisterForm, ApplicationForm, ReviewForm
 def is_admin(user):
     return user.is_authenticated and user.username == 'Admin26'
 
-# ---------- Регистрация ----------
 def register_view(request):
     form = RegisterForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -20,7 +19,6 @@ def register_view(request):
         return redirect('login')
     return render(request, 'core/register.html', {'form': form})
 
-# ---------- Вход ----------
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -36,7 +34,6 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-# ---------- Личный кабинет ----------
 @login_required
 def cabinet_view(request):
     apps = request.user.applications.all()
@@ -47,7 +44,6 @@ def cabinet_view(request):
         'can_review_ids': [a.id for a in apps if a.status == Status.DONE and not hasattr(a, 'review')],
     })
 
-# ---------- Создание заявки ----------
 @login_required
 def application_create(request):
     form = ApplicationForm(request.POST or None)
@@ -60,7 +56,6 @@ def application_create(request):
         return redirect('cabinet')
     return render(request, 'core/application_form.html', {'form': form})
 
-# ---------- Отзыв ----------
 @login_required
 def review_create(request, app_id):
     application = get_object_or_404(Application, pk=app_id, user=request.user)
@@ -80,7 +75,6 @@ def review_create(request, app_id):
         return redirect('cabinet')
     return render(request, 'core/review_form.html', {'form': form, 'app': application})
 
-# ---------- Админ-панель ----------
 @user_passes_test(is_admin, login_url='login')
 def admin_panel(request):
     q = request.GET.get('q', '').strip()
